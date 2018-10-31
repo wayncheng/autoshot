@@ -3,7 +3,17 @@
 	module.exports = {
 		urls: [
 			'https://google.com',
-			'https://example.com',
+			['www.example.com','what','is','up'],
+			{
+				protocol: 'https',
+				env: 'www',
+				domain: 'che.ng',
+				path: '/path-to-whatever'
+			},
+			2312,
+			undefined,
+			null,
+			Math,
 		],
 		viewports: ['mobile','tablet','desktop'],
 		// devices: [],
