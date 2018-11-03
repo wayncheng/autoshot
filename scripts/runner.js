@@ -3,117 +3,175 @@
 	const path = require('path');
 	const fs = require('fs');
 	const puppeteer = require('puppeteer');
-	const params = require('../config/params');
-	const screenshot = require('./screenshot');
+	const defaultOptions = require('../config/defaultOptions');
+	const {takeScreenshot} = require('./screenshot');
 	const constants = require('../config/constants');
 
-	let savePath;
+	let userOpts = {
+		// urls: [
+		// 	'example.com',
+		// 	'www.google.com',
+		// 	'https://che.ng/portfolio',
+		// 	'https://www.medium.com'
+		// ]
+		urls: [
+			'reddit.com/r/nba',
+			'reddit.com/r/corgi',
+		]
+	};
 
-	savePath = path.resolve(path.join(params.savePathBase, params.saveDirName));
-	console.log('savePath:', savePath);
+	const autoshot = async function(userOptions) {
+		console.log('\n---- autoshot --->')
+		// let shotList = [];
+		let params = {
+			...defaultOptions,
+			...userOptions
+		};
+		// let savePath = path.resolve( params.savePathBase, params.saveDirName );
+		let savePath = path.resolve( params.savePathBase );
+		params.savePath = savePath;
+		console.log('savePath:', savePath);
 
-	fs.mkdir(savePath, err => {
-		if (err) console.log(err);
-	});
-
-	//* Build Master Shot List =====================
-
-	params.urls.forEach( (url,i) => {
-		let type = typeof url;
-		let finalURL;
-		// console.log('type:', type);
-		// let isObject = false;
-		// try {
-		// 	// let base = url.domain;
-		// 	if (url && type === 'object' && url.constructor === Object && url !== Math)
-		// 		isObject = true
-		// }
-		// catch (e){
-		// 	console.log('------------------');
-		// }
-		// finally {
-		// 	console.log('isObject:',isObject)
-		// }
-
-		if (url && type === 'object' && url.constructor === Object && url !== Math )
-			console.log(i)
+		// Build Master Shot List ==========================================
+		let shotList = await buildShotList(params);
 		
+		/* Example of shotList .................
+			shotList = [
+		 		{
+		 			url: 'https://google.com/bing',
+		 			viewport: 'desktop',
+		 			userAgent: 'chrome',
+		 			fileSafeName: 'https.google.com.bing [desktop,chrome]'
+		 		},
+		 		{
+		 			url: 'https://google.com/bing',
+		 			viewport: 'mobile',
+		 			userAgent: 'chrome',
+		 			fileSafeName: 'https.google.com.bing [mobile,chrome]'
+		 		}
+			]
+		*/
 
-		// function isObject(value) {
-		// 	return value && typeof value === 'object' && value.constructor === Object;
-		// }
-		/ console.log('isObject(url):                                 
-		// console.log('(url === null):',(url === null))
-		// console.log('(Math === null):',(Math === null))
 
-		// if (type === 'object' && Array.isArray(url)){
-		// 	type = 'array'
-		// }
-		// console.log('type:',type)
+		// Create save directory =========================================
+		// savePath = 'C:\\Users\\w\\git\\autoshot\\screenshots\\reddit'
+		// await fs.mkdir(savePath, err => {
+		// 	if (err) console.log(err);
+		// });
 
-		// if ( Array.isArray(url) ){
-		// 	finalURL = url.join('/')
-		// }
-		// else if ( type === 'object' ){
-		// 	let output = '';
-		// 	let {protocol,env,domain,path} = url;
 
-		// 	if (protocol)
-		// 		output += protocol += '://';
-		// 	if (env)
-		// 		output += env += '.';
-		// 	output += domain;
-		// 	output += path;
 
-		// 	finalURL = output;
-		// }
-		// else if (type === 'string'){
-		// 	finalURL = url
-		// }
-		// else {
-		// 	console.log('yo wtf is this url?')
-		// }
-		// console.log('finalURL:',finalURL)
-	});
-	// const shotList = [];
-	// params.urls.forEach( url => {
-	// 	params.viewports.forEach( viewport => {
-	// 		params.userAgents.forEach( userAgent => {
+		await puppeteer
+		.launch({
+			headless: !params.watch || true,
+			slowMo: 0,
+			timeout: params.timeout || 30000,
+			ignoreHTTPSErrors: true,
+			defaultViewport: params.viewports || constants.viewports.desktop,
+		})
+		.then(async browser => {
+			const page = await browser.newPage();
 
-	// 			let spec = {
-	// 				url,
-	// 				viewport,
-	// 				userAgent,
-	// 			}
+			
+			//========================================
+			//  TAKE SCREENSHOT
+			//========================================
+			for (let i = 0; i < shotList.length; i++) {
+				const shotSpec = shotList[i];
 
-	// 			shotList.push(spec)
+				let screenshotOptions = {
+					path,
+				}
+				let viewport = shotSpec.viewport
 
-	// 		})
-	// 	})
-	// })
-	// console.log(`shot list (${shotList.length})...`)
-	// shotList.forEach( x => console.log('  ',JSON.stringify(x)) )
-	// console.log('shotList\n',JSON.stringify(shotList, null, 2))
+				await takeScreenshot(page,screenshotOptions,null)
+			}
+			// shotList.forEach(async shotOptions => {
+				
+			// });
+			//========================================
 
-	// puppeteer
-	// .launch({
-	// 	headless: !params.watch || true,
-	// 	slowMo: 0,
-	// 	timeout: params.timeout || 30000,
-	// 	ignoreHTTPSErrors: true,
-	// 	defaultViewport: params.viewports || [constants.viewports.desktop],
-	// })
-	// .then(async browser => {
-	// 	const page = await browser.newPage();
 
-	// 	await screenshot(page,options)
+			await page.close();
+			await browser.close();
+		})
+		.catch(err => {
+			throw err;
+		});
+	};
+	
+	
+	const buildShotList = function(params) {
+		console.log('\n---- buildShotList --->')
+		const shotList = [];
 
-	// 	await page.close();
-	// 	await browser.close();
-	// })
-	// .catch(err => {
-	// 	throw err;
-	// });
+		params.urls.forEach((url, i) => {
+			let dataType = typeof url;
+
+			if (dataType === 'string') {
+				// shotList.push(url);
+			} else if (
+				url &&
+				dataType === 'object' &&
+				url.constructor === Object &&
+				url !== Math
+			) {
+				// If an object ...........
+				console.log('OBJECT!!!!!!!!!!!!!!!!!!!!!!!!!!');
+				url = 'object.com';
+			}
+
+			// For each URL, test in all combos of all environments
+
+			params.viewports.forEach(viewport => {
+				params.userAgents.forEach(userAgent => {
+					
+					let fsURL = url
+								.replace('://', '.')
+								.split('/')
+								.join('.');
+					let fileSafeName = `${fsURL} [${viewport},${userAgent}]`
+					let savePath = path.resolve(params.savePathBase,fileSafeName);
+					// let savePath = path.resolve( params.savePathBase );
+					// params.savePath = savePath;
+					console.log('savePath:', savePath);
+
+					let spec = {
+						url,
+						viewport,
+						userAgent,
+						fileSafeName,
+						path: savePath,
+					};
+
+					shotList.push(spec);
+				});
+			});
+		});
+
+		console.log(`shot list (${shotList.length})...`);
+		shotList.forEach(x => console.log('  ', JSON.stringify(x)));
+		// console.log( '\n', JSON.stringify(shotList, null, 2) );
+
+		return shotList;
+	};
+
+
+
+
+	// const screenshot = async ( page, screenshotOptions ) => {
+	// 	console.log('screenshotOptions:',screenshotOptions)
+	// 	const { url } = screenshotOptions;
+	// 	await page.goto();
+	// }
+
+
+
+
+
+
+
+	autoshot(userOpts);
 })();
 
 /*
@@ -126,3 +184,23 @@ chromium flags (go in args):
 https://peter.sh/experiments/chromium-command-line-switches/
 
 */
+
+// const shotList = [];
+// params.urls.forEach( url => {
+// 	params.viewports.forEach( viewport => {
+// 		params.userAgents.forEach( userAgent => {
+
+// 			let spec = {
+// 				url,
+// 				viewport,
+// 				userAgent,
+// 			}
+
+// 			shotList.push(spec)
+
+// 		})
+// 	})
+// })
+// console.log(`shot list (${shotList.length})...`)
+// shotList.forEach( x => console.log('  ',JSON.stringify(x)) )
+// console.log('shotList\n',JSON.stringify(shotList, null, 2))
