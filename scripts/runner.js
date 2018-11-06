@@ -3,10 +3,9 @@
 	const path = require('path');
 	const fs = require('fs');
 	const puppeteer = require('puppeteer');
-	const defaultOptions = require('../config/defaultOptions');
+	const defaultOptions = require('./../config/defaultOptions');
 	const {takeScreenshot} = require('./screenshot');
-	const constants = require('../config/constants');
-
+	const constants = require('./../config/constants');
 	let userOpts = {
 		// urls: [
 		// 	'example.com',
@@ -15,10 +14,20 @@
 		// 	'https://www.medium.com'
 		// ]
 		urls: [
-			'reddit.com/r/nba',
-			'reddit.com/r/corgi',
+			'https://reddit.com/r/nba',
+			'https://reddit.com/r/corgi',
 		]
 	};
+	
+	fs.readFile('./config/urls.txt','utf8', (err,data) => {
+		if (err) throw err;
+		let newlinePattern = /[\n^\r]+/g;
+		let urlArray = data.split(newlinePattern)
+		// console.log('split:',split);
+		userOpts.urls = urlArray
+		
+		autoshot(userOpts);
+	})
 
 	const autoshot = async function(userOptions) {
 		console.log('\n---- autoshot --->')
@@ -63,11 +72,13 @@
 
 		await puppeteer
 		.launch({
-			headless: !params.watch || true,
+			// headless: !params.watch || true,
+			headless: true,
 			slowMo: 0,
-			timeout: params.timeout || 30000,
+			// timeout: params.timeout || 30000,
+			timeout: 30000,
 			ignoreHTTPSErrors: true,
-			defaultViewport: params.viewports || constants.viewports.desktop,
+			// defaultViewport: params.viewports || constants.viewports.desktop,
 		})
 		.then(async browser => {
 			const page = await browser.newPage();
@@ -80,11 +91,13 @@
 				const shotSpec = shotList[i];
 
 				let screenshotOptions = {
-					path,
+					path: shotSpec.path+'.png',
 				}
 				let viewport = shotSpec.viewport
 
-				await takeScreenshot(page,screenshotOptions,null)
+				await page.goto(shotSpec.url)
+
+				await takeScreenshot(page,screenshotOptions,viewport)
 			}
 			// shotList.forEach(async shotOptions => {
 				
@@ -128,13 +141,15 @@
 					
 					let fsURL = url
 								.replace('://', '.')
-								.split('/')
+								.split(/[/?]+/g)
 								.join('.');
-					let fileSafeName = `${fsURL} [${viewport},${userAgent}]`
+					// fsURL = encodeURIComponent(url);
+								
+					let fileSafeName = `${fsURL}[${viewport},${userAgent}]`
 					let savePath = path.resolve(params.savePathBase,fileSafeName);
 					// let savePath = path.resolve( params.savePathBase );
 					// params.savePath = savePath;
-					console.log('savePath:', savePath);
+					// console.log('savePath:', savePath);
 
 					let spec = {
 						url,
@@ -149,8 +164,8 @@
 			});
 		});
 
-		console.log(`shot list (${shotList.length})...`);
-		shotList.forEach(x => console.log('  ', JSON.stringify(x)));
+		// console.log(`shot list (${shotList.length})...`);
+		// shotList.forEach(x => console.log('  ', JSON.stringify(x)));
 		// console.log( '\n', JSON.stringify(shotList, null, 2) );
 
 		return shotList;
@@ -171,7 +186,6 @@
 
 
 
-	autoshot(userOpts);
 })();
 
 /*

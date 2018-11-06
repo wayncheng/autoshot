@@ -18,8 +18,9 @@
 	},
 	"main": "index.js",
 	"scripts": {
-		"cmd": "node command.js",
-		"capture": "node command.js capture",
+		"cmd": "node scripts/command.js",
+		"capture": "node scripts/command.js capture",
+		"start": "node scripts/runner.js",
 		"example": "yarn capture --url https://che.ng --devices mobile,tablet,desktop --watch"
 	},
 	"bin": {

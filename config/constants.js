@@ -1,8 +1,7 @@
 'use strict';
 (function() {
 	const viewports = {
-		// + Most Popular Viewports ..................
-
+		// Most Popular Viewports ..................
 		mobile: {
 			// Most common mobile res (41% of mobile screens worldwide, 22% of all screens worldwide)
 			width: 360,
@@ -25,8 +24,7 @@
 			hasTouch: true
 		},
 
-		// + iPhones ..................
-
+		// iPhones ..................
 		iphone: {
 			// iPhone 6,6s,7,8
 			width: 375,
@@ -63,8 +61,7 @@
 			hasTouch: true
 		},
 
-		// + iPads ....................
-
+		// iPads ....................
 		ipadPro: {
 			// iPad Pro
 			width: 1024,
@@ -80,8 +77,7 @@
 			hasTouch: true
 		},
 
-		// + Desktops ..................
-
+		// Desktops ..................
 		desktop_1080: {
 			// 1080p Desktop
 			width: 1920,
@@ -89,7 +85,6 @@
 			isMobile: false,
 			hasTouch: false
 		},
-
 		desktop_1440: {
 			// 1440p Desktop
 			width: 2560,
@@ -106,6 +101,6 @@
 		}
 	};
 	module.exports = {
-		viewports,
+		viewports
 	};
 })();
