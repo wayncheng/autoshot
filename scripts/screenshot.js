@@ -19,8 +19,26 @@
 		
 			// console.log('shotSpecs:',shotSpecs)
 
-			const bodyHeight = await page.$eval('body', el => el.scrollHeight);
+			const bodyHeight = await page.$eval('body', el => {
+				// scroll to bottom to trigger lazy loads, then scroll back to top.
+				window.scrollTo(0,el.scrollHeight)
+				return el.scrollHeight
+			});
 			const bodyWidth = await page.$eval('body', el => el.offsetWidth);
+
+			// await window.scrollTo(0,bodyHeight);
+			// await page.evaluate(_viewportHeight => {
+			// 	window.scrollBy(0, _viewportHeight);
+			//   }, viewportHeight);
+			//   await page.evaluate( () => {
+			// 	window.scrollTo(0, bodyHeight);
+			//   });
+
+			await page.waitFor(3000);
+			await page.$eval('body', () => {
+				window.scrollTo(0,0)
+			})
+
 			const defaultScreenshotOptions = {
 				type: 'png',
 				path: undefined,
