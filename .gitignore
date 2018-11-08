@@ -5,7 +5,7 @@
 */node_modules
 
 # testing
-/coverag
+/coverage
 
 #internal
 /internal

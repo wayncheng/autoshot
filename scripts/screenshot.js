@@ -8,7 +8,7 @@
 
 	
 	const takeScreenshot = ( async ( page, shotSpecs,viewport ) => {
-		console.log('\n---- takeScreenshot --->')
+		console.log('---- screenshot --->')
 			let viewportOptions = defaultViewport;
 			// let viewportOptions = constants.viewports[viewport] || defaultViewport;
 			// if (viewport && constants.viewports[viewport]){
@@ -44,7 +44,6 @@
 			// > Take Screenshot
 			await page.screenshot(shotOptions, function(err){
 				if (err) throw err;
-				console.log('noice')
 			})
 		})
 

@@ -47,7 +47,7 @@
 	}
 	
 	const buildShotList = function(params) {
-		console.log('\n---- buildShotList --->')
+		// console.log('\n---- buildShotList --->')
 		const shotList = [];
 
 		params.urls.forEach((url, i) => {
@@ -71,12 +71,9 @@
 			params.viewports.forEach(viewport => {
 				params.userAgents.forEach(userAgent => {
 					let noProtocol = url.split('://')[1];
-					// let fsURL = url
-					// 			.replace('://', '.')
-					// 			.split(/[/?]+/g)
-					// 			.join('.');
+					// let fsURL = url .replace('://', '.') .split(/[/?]+/g).join('.');
 					let fsURL = noProtocol
-								.split(/[/?]+/g)
+								.split(/[/?:]+/g)
 								.join('.');
 					// fsURL = encodeURIComponent(url);
 								
@@ -118,7 +115,7 @@
 	})
 
 	const autoshot = async function(userOptions) {
-		console.log('\n---- autoshot --->')
+		// console.log('\n---- autoshot --->')
 		// let shotList = [];
 		let params = {
 			...defaultOptions,
@@ -129,7 +126,7 @@
 		let savePath = await initDir();
 		// params.savePath = savePath;
 		params.savePathBase = savePath;
-		console.log('savePath:', savePath);
+		// console.log('savePath:', savePath);
 
 		// Build Master Shot List ==========================================
 		let shotList = await buildShotList(params);
@@ -197,8 +194,11 @@
 
 			await page.close();
 			await browser.close();
+
+			console.log('.... screenshots saved');
 		})
 		.catch(err => {
+			console.log('.... error taking screenshots');
 			throw err;
 		});
 	};
