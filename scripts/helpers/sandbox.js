@@ -1,7 +1,7 @@
 'use strict';
 (function(){
 	// const chalk = require('chalk');
-	const { log, color } = require('../config/chalk')
+	const { log, color } = require('../helpers/chalk')
 	
 	console.log('--------')
 	const text = 'Lorem Ipsum';
