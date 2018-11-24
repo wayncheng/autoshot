@@ -19,6 +19,10 @@
 			'https://reddit.com/r/corgi',
 		]
 	};
+	
+	let global = {
+		urls
+	}
 
 	const initDir = function(){
 		// Get current time and format it so that it is safe to be used as a file name. (i.e. no slashes or colons, etc.)
@@ -31,19 +35,25 @@
 		let time = d.toLocaleTimeString("en-US", { hour12: false });
 		let fileTime = time.split(":").join("");
 		let timestamp = dateISO + "_" + fileTime; // e.g. 20181010_123456
+		global.timestamp = timestamp;
 
-		// Take path defined in constants and create a new directory for this tests results
-		const dirPath = path.resolve('./screenshots', timestamp);
 
-		// Make Results Directory
+		// path to save directory where screenshots will be saved
+		const dirPath = path.resolve('./screenshots', a.timestamp);
+		global.dirPath = dirPath;
+
+		// make save dir
 		fs.mkdir(dirPath, err => {
+			// if the screenshots folder doesn't exist, create that folder first, then create save dir
 			if (err) {
-				fs.mkdirSync(path.resolve('./screenshots'), err => console.log('err:',err))
-				fs.mkdirSync(dirPath,err => console.log(err))
+				fs.mkdir(path.resolve('./screenshots'), err => {
+					console.log('err:',err)
+					fs.mkdir(dirPath,err => console.log(err))
+				})
 			}
+			
+			return dirPath;
 		})
-
-		return dirPath;
 	}
 	
 	const buildShotList = function(params) {
@@ -51,23 +61,12 @@
 		const shotList = [];
 
 		params.urls.forEach((url, i) => {
-			let dataType = typeof url;
+			// let dataType = typeof url;
+			// If an object ...........
+			// if ( url && dataType === 'object' && url.constructor === Object && url !== Math ) { }
 
-			if (dataType === 'string') {
-				// shotList.push(url);
-			} else if (
-				url &&
-				dataType === 'object' &&
-				url.constructor === Object &&
-				url !== Math
-			) {
-				// If an object ...........
-				console.log('OBJECT!!!!!!!!!!!!!!!!!!!!!!!!!!');
-				url = 'object.com';
-			}
-
+			
 			// For each URL, test in all combos of all environments
-
 			params.viewports.forEach(viewport => {
 				params.userAgents.forEach(userAgent => {
 					let noProtocol = url.split('://')[1];
@@ -124,9 +123,8 @@
 		// let savePath = path.resolve( params.savePathBase, params.saveDirName );
 		// let savePath = path.resolve( params.savePathBase );
 		let savePath = await initDir();
-		// params.savePath = savePath;
+
 		params.savePathBase = savePath;
-		// console.log('savePath:', savePath);
 
 		// Build Master Shot List ==========================================
 		let shotList = await buildShotList(params);

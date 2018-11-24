@@ -1,4 +1,6 @@
-https://google.com
-https://che.ng
-www.cnn.com
-reddit.com
+https://www.google.com
+https://che.ng/portfolio
+http://example.com
+www.reddit.com
+http://fortnite.che.ng
+
