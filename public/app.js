@@ -5,6 +5,12 @@ $(document).ready(function() {
 		var urls = $('#urls').val().trim();
 		var urlArray = urls.split(/[\n\r]/g);
 		// console.log('urlArray:', urlArray);
+		
+		// add loading icon
+		$('#submit').addClass('is-loading');
+		// clear out existing link
+		$('#download-section').empty();
+
 
 		postData(urlArray)
 	});
@@ -40,8 +46,31 @@ $(document).ready(function() {
 			}
 		}).done(function(res) {
 			console.log('res:', res);
+			var downloadID = res.downloadID;
+			
+			// build download link
+			var $link = $('<a>',{
+				href: '/api/download/'+downloadID,
+				class: 'dl-btn button is-large is-success',
+				id: 'download-trigger'
+			})
+
+			var $linkIconContainer = $('<span>').addClass('icon');
+			var $linkIcon = $('<i>').addClass('fas fa-download');
+			$linkIconContainer.append($linkIcon)
+			$link.append($linkIconContainer);
+			
+			var $linkText = $('<span>').text('Download Screenshots');
+			$link.append($linkText);
+
+			$('#download-section').append($link)
+
+			// remove loading icon from submit button
+			$('#submit').removeClass('is-loading');
 		});
 	}
+
+
 });
 
 

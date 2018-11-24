@@ -31,4 +31,4 @@ yarn-error.log*
 /node_modules_corrupted
 .vscode
 
-/screenshots
+# /screenshots

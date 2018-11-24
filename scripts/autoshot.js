@@ -22,7 +22,6 @@
 		urls: [],
 		dirPath: '',
 		shotList: [],
-		savedFiles: [],
 
 		fileType: 'png',
 		viewports: [ 'mobile', 'desktop' ],
@@ -32,12 +31,21 @@
 		// timeout: 30000,
 		// devices: [],
 	};
+	let savedFiles = [];
+
+	function makeID() {
+		let date = Date.now();
+		let rand = Math.random().toString(36).substr(2, 4);
+		let id = date + rand;
+		return id;
+	}
 
 	//+ AUTOSHOT ====================================================
 	const autoshot = async (urls) => {
 		console.log('\n---- autoshot --->');
 		let shotList = [];
 		let dirPath;
+		let id = makeID();
 
 		// combine custom options with the default options
 		params = {
@@ -46,25 +54,22 @@
 		};
 
 		// + Create save dir .................................
-		console.log('.... creating save directory');
-		// Get current time and format it so that it is safe to be used as a file name. (i.e. no slashes or colons, etc.)
-		let d = new Date();
-		let dateISO = d.toISOString().slice(0, 10).split('-').join('');
-		let time = d.toLocaleTimeString('en-US', { hour12: false });
-		let fileTime = time.split(':').join('');
-		let timestamp = dateISO + '_' + fileTime; // e.g. 20181010_123456
+		// console.log('.... creating save directory');
+		// let d = new Date();
+		// let dateISO = d.toISOString().slice(0, 10).split('-').join('');
+		// let time = d.toLocaleTimeString('en-US', { hour12: false });
+		// let fileTime = time.split(':').join('');
+		// let timestamp = dateISO + '_' + fileTime; // e.g. 20181010_123456
 
 		// Path to save directory where screenshots will be saved
-		dirPath = path.resolve('./screenshots', timestamp);
+		dirPath = path.resolve('./screenshots', id);
 		// params.dirPath = dirPath;
 
 		// Make save dir
 		fs.mkdirSync(dirPath, (err) => {
 			if (err) {
 				// if the screenshots folder doesn't exist, create that folder first, then create save dir
-				fs.mkdirSync(path.resolve('./screenshots'), (err) => {
-					console.log('err:', err);
-				});
+				fs.mkdirSync(path.resolve('./screenshots'), (err) => { console.log('err:', err); });
 				fs.mkdirSync(dirPath, (err) => console.log(err));
 			}
 		});
@@ -72,8 +77,8 @@
 		// LAUNCH PUPPETEER ________________________________
 		await puppeteer
 			.launch({
-				// headless: true,
-				headless: false,
+				headless: true,
+				// headless: false,
 				slowMo: 0,
 				ignoreHTTPSErrors: true,
 				timeout: 30000
@@ -85,14 +90,14 @@
 				// For each URL, take screenhots in all combos of all environments
 				for (let i = 0; i < urls.length; i++) {
 					let url = urls[i];
-					
+
 					// Add scheme if one is not provided
-					if (url.indexOf('://') === -1){
+					if (url.indexOf('://') === -1) {
 						url = 'http://' + url;
 					}
 
 					// URL Navigation ..................
-					console.log('url:',url);
+					console.log('url:', url);
 					await page.goto(url);
 
 					for (let j = 0; j < params.viewports.length; j++) {
@@ -115,7 +120,7 @@
 						await page.$eval('body', (el) => {
 							window.scrollTo(0, el.scrollHeight);
 						});
-						await page.waitFor(3000);
+						await page.waitFor(2000);
 						await page.$eval('body', () => {
 							window.scrollTo(0, 0);
 						});
@@ -131,15 +136,15 @@
 							// 	width: bodyWidth,
 							// 	height: bodyHeight
 							// }
-							fullPage: true,
+							fullPage: true
 						};
 
 						// > Actually Take Screenshot in Puppeteer .....................
 						await page.screenshot(puppeteerScreenshotOptions, function(err) {
 							if (err) throw err;
-
-							params.savedFiles.push(puppeteerScreenshotOptions.path);
 						});
+
+						savedFiles.push(savePath);
 					}
 				}
 				console.log('.... screenshots saved');
@@ -157,13 +162,14 @@
 				// close everything
 				await page.close();
 				await browser.close();
-
-				return await params.savedFiles;
 			})
 			.catch((err) => {
 				console.log('.... error taking screenshots');
 				throw err;
 			});
+
+		// return await savedFiles;
+		return await id;
 	};
 
 	module.exports = autoshot;

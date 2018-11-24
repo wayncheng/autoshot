@@ -1,10 +1,12 @@
+html {
+	font-size: 16px;
+}
+
 main {
 	min-height: 100vh;
 }
 
-.form-section {
-	min-height: 70vh;
-}
+
 form {
 	max-width: 500px;
 	margin: 0 auto;
@@ -15,4 +17,18 @@ form {
 
 header .title {
 	text-align: center;
+}
+
+/* .dl-box {
+	margin: 0 auto;
+	max-width: 400px;
+} */
+.dl-section {
+	text-align: center;
+}
+.dl-btn {
+	padding: 2rem;
+}
+.dl-btn span.icon {
+	margin-right: 1rem !important;
 }
