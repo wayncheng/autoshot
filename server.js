@@ -30,20 +30,17 @@
 		console.log('>', req.url);
 		res.header('Access-Control-Allow-Origin', '*');
 		res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+		res.header('Access-Control-Allow-Methods', 'GET/POST');
+		// res.header('Access-Control-Allow-Methods', 'POST,GET');
 		next();
 	});
 
 	// ROUTES ======================================================
 	app.post('/api/run', async (req, res) => {
 		let { urls } = req.body;
-		console.log('urls:', urls);
-		let options = {
-			urls: urls
-		};
-		// await autoshot(urls)
+
 		let response = await autoshot(urls);
-		console.log('response:', response);
-		console.log('response[0]:', response[0]);
+
 		await res.json({
 			status: 'ok',
 			urls: urls,
@@ -66,7 +63,6 @@
 		fs.readdir(dirPath, { withFileTypes: true }, async function(err, files) {
 			if (err) throw err;
 
-			console.log('files:', files);
 			for (let i = 0; i < files.length; i++) {
 				const file = files[i];
 				let filePath = path.join(dirPath, file.name);
