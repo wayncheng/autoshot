@@ -1,0 +1,18 @@
+main {
+	min-height: 100vh;
+}
+
+.form-section {
+	min-height: 70vh;
+}
+form {
+	max-width: 500px;
+	margin: 0 auto;
+}
+.form .textarea {
+	min-height: 240px;
+}
+
+header .title {
+	text-align: center;
+}

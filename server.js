@@ -38,8 +38,7 @@
 		let options = {
 			urls: urls,
 		}
-		console.log('options:',options);
-		await autoshot(options)
+		await autoshot(urls)
 		// let savedFiles = await autoshot(options)
 
 		await res.json({
