@@ -25,7 +25,7 @@ $(document).ready(function() {
 	// var sample = [
 	// 	'https://www.google.com',
 	// 	'https://che.ng/portfolio',
-	// 	'http://example.com',
+	// 	'example.com',
 	// 	'www.reddit.com',
 	// 	'http://fortnite.che.ng'
 	// ];
@@ -48,7 +48,6 @@ $(document).ready(function() {
 /* Sample URLs
 https://www.google.com
 https://che.ng/portfolio
-http://example.com
 www.reddit.com
 http://fortnite.che.ng
 */
